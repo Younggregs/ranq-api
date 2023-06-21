@@ -67,6 +67,9 @@ class Poll(BaseModel):
   def __str__(self):
       return "{}".format(self.title)
   
+  class Meta:
+        ordering = ['-created_at']
+  
 class Contestant(BaseModel):  
     poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)
     name = models.CharField(max_length = 100)
@@ -95,6 +98,7 @@ class Vote(BaseModel):
     
     def __str__(self):
         return "{}".format(self.poll.title)
+    
     
 class Result(BaseModel):
     poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)

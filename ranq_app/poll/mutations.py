@@ -32,4 +32,12 @@ class CreatePollMutation(graphene.Mutation):
         poll.duration = duration
         poll.save()
         
+        # save contestants
+        for item in contestants:
+            contestant = Contestant()
+            contestant.poll_id = poll
+            contestant.name = item
+            contestant.save()
+            
+        
         return CreatePollMutation(poll=poll)
