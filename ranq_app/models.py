@@ -95,7 +95,7 @@ class PrivateVoter(BaseModel):
         return "{}".format(self.email)
     
 class Voter(BaseModel):
-    poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE, default = "8a6e5a52-1fb2-4c78-bfad-2d6def278c79")
+    poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)
     email = models.EmailField(_('email address'))
     token = models.CharField(max_length = 100, blank=True)
     voted = models.BooleanField(default = False)
