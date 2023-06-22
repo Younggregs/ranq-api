@@ -1,7 +1,8 @@
 import graphene
-from ranq_app.models import Poll, Contestant
+from ranq_app.models import Poll, Contestant, PrivateVoter, Voter
 from ranq_app.poll.types import PollType
-
+from ranq_app.lib.email import Email
+from ranq_app.lib.random import Random
 class CreatePollMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
@@ -30,6 +31,7 @@ class CreatePollMutation(graphene.Mutation):
         poll.type = type
         poll.voters = voters
         poll.duration = duration
+        poll.token = Random.generate_random_string(6)
         poll.save()
         
         # save contestants
@@ -39,5 +41,27 @@ class CreatePollMutation(graphene.Mutation):
             contestant.name = item
             contestant.save()
             
+        # save private voters
+        if type.lower() == 'private':
+            for email in voters:
+                voter = PrivateVoter()
+                voter.poll_id = poll
+                voter.email = email
+                voter.save()
+                
+                token = Random.generate_random_string()
+                voter = Voter()
+                voter.poll_id = poll
+                voter.email = email
+                voter.token = token
+                voter.save()
+                
+                # send email
+                newEmail = Email(email, token, 'rank', 2)
+                try:
+                    newEmail.send()
+                except:
+                    pass
+                
         
         return CreatePollMutation(poll=poll)

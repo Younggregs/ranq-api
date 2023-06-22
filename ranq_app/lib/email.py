@@ -28,7 +28,7 @@ class Email:
             "params": {
                 "link": self.link
             },
-            "templateId": 1,
+            "templateId": self.templateId,
         } 
 
         return r.post(url, json = data, headers = headers)
