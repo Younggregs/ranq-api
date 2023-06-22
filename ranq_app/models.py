@@ -19,6 +19,14 @@ class StatusEnum(Enum):
     
 STATUSES = tuple((item.value, item.name) for item in list(StatusEnum))
 
+class EmailTypeEnum(Enum):
+    signup_email = 'signup_email'
+    vote_email = 'vote_email'
+    forgot_password = 'forgot_password'
+    
+    
+EMAIL_TYPES = tuple((item.value, item.name) for item in list(EmailTypeEnum))
+
 class BaseModel(models.Model):
     id = models.UUIDField(
          primary_key = True,
@@ -43,7 +51,7 @@ class User(AbstractUser):
   
 class EmailToken(BaseModel):
   email = models.EmailField(_('email address'), unique = True)
-  type = models.CharField(max_length = 50)
+  type = models.CharField(max_length = 50, choices = EMAIL_TYPES, default = EmailTypeEnum.signup_email.value)
   token = models.CharField(max_length = 100)
   expiry_date = models.DateField(default = timezone.now)
   
@@ -60,6 +68,7 @@ class Poll(BaseModel):
   duration = models.CharField(max_length = 50)
   type = models.CharField(max_length = 50, choices = TYPES, default = TypeEnum.public.value)
   status = models.CharField(max_length = 50, choices = STATUSES, default = StatusEnum.ongoing.value)
+  token = models.CharField(max_length = 100, blank=True)
   start_date =  models.DateTimeField(default=timezone.now)
   end_date =  models.DateTimeField(default=timezone.now)
   created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE)
@@ -80,6 +89,7 @@ class Contestant(BaseModel):
 class PrivateVoter(BaseModel):  
     poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)
     email = models.EmailField(_('email address'))
+    token = models.CharField(max_length = 100, blank=True)
     
     def __str__(self):
         return "{}".format(self.email)
