@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='voter',
             name='poll_id',
-            field=models.ForeignKey(default='8a6e5a52-1fb2-4c78-bfad-2d6def278c79', on_delete=django.db.models.deletion.CASCADE, to='ranq_app.poll'),
+            field=models.ForeignKey( on_delete=django.db.models.deletion.CASCADE, to='ranq_app.poll'),
         ),
         migrations.AddField(
             model_name='voter',
