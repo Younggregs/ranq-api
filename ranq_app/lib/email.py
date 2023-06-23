@@ -5,12 +5,11 @@ env = environ.Env()
 environ.Env.read_env()
 
 class Email:
-    def __init__(self, email, token, page, templateId):
-        self.email = email
-        self.link = env('UI_URL') + '/' + page + '?token=' + str(token)
-        self.templateId = templateId
-
-    def send(self):
+    
+    @staticmethod
+    def send(email, token, page, templateId, title=""):
+        link = env('UI_URL') + '/' + page + '?token=' + str(token)
+        
         url = 'https://api.brevo.com/v3/smtp/email'
         headers = {
             "Content-Type": "application/json", 
@@ -19,16 +18,17 @@ class Email:
             }
         data = {
             "to": [
-                {"email": self.email, "name": self.email}
+                {"email": email, "name": email}
             ],
             "headers": {
                 "X-Mailin-custom":"custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3",
                 "charset":"iso-8859-1"
             },
             "params": {
-                "link": self.link
+                "link": link,
+                "title": title
             },
-            "templateId": self.templateId,
+            "templateId": templateId,
         } 
 
         return r.post(url, json = data, headers = headers)

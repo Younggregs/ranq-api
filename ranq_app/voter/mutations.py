@@ -22,27 +22,27 @@ class CreateVoterMutation(graphene.Mutation):
         if not Poll.objects.filter(token=token).exists():
             return CreateVoterMutation(error=ErrorType(message='Invalid token'))
         
+        poll = Poll.objects.get(token=token)
         # check if user has voted
-        if Voter.objects.filter(email=email, poll_id=Poll.objects.get(token=token), voted=True).exists():
+        if Voter.objects.filter(email=email, poll_id=poll, voted=True).exists():
             return CreateVoterMutation(error=ErrorType(message='This email already voted'))
         
         # check if user email is registered as voter
         voter = ""
-        if Voter.objects.filter(email=email, poll_id=Poll.objects.get(token=token)).exists():
-            voter = Voter.objects.get(email=email, poll_id=Poll.objects.get(token=token))
+        if Voter.objects.filter(email=email, poll_id=poll).exists():
+            voter = Voter.objects.get(email=email, poll_id=poll)
         else:
             # create voter
             voter = Voter()
-            voter.poll_id = Poll.objects.get(token=token)
+            voter.poll_id = poll
             voter.email = email
         
         voterToken = Random.generate_random_string()
         voter.token = voterToken
         voter.save()
         
-        newEmail = Email(email, voterToken, 'rank', 2)
         try:
-            newEmail.send()
+            Email.send(email, voterToken, 'rank', 2, poll.title )
         except:
             pass
 

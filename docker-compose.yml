@@ -9,6 +9,13 @@ services:
       - POSTGRES_DB=ranq_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=ytrewq
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: always
+    expose:
+      - "6379"
   web:
     build: .
     command: gunicorn ranq.wsgi:application --workers=3 --bind 0.0.0.0:8000
@@ -18,3 +25,11 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
+  celery:
+    build: .
+    command: celery -A ranq worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis

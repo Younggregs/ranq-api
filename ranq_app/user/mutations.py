@@ -32,9 +32,8 @@ class EmailVerificationMutation(graphene.Mutation):
             pass
         
         token = Random.generate_random_string()
-        newEmail = Email(email, token, page, templateId)
-        try:
-            newEmail.send()
+        try: 
+            Email.send(email, token, page, templateId)
         except:
             pass
         

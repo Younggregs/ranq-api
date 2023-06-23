@@ -3,6 +3,7 @@ from ranq_app.models import Poll, Contestant, PrivateVoter, Voter
 from ranq_app.poll.types import PollType
 from ranq_app.lib.email import Email
 from ranq_app.lib.random import Random
+from ranq_app.tasks import result_task
 class CreatePollMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
@@ -12,13 +13,14 @@ class CreatePollMutation(graphene.Mutation):
         type = graphene.String(required=True)
         voters = graphene.List(graphene.String)
         duration = graphene.String(required=True)
-
+        duration_s = graphene.Int(required=True)
+        
 
     # The class attributes define the response of the mutation
     poll = graphene.Field(PollType)
 
     @classmethod
-    def mutate(cls, root, info, title, description, contestants, type, voters, duration):
+    def mutate(cls, root, info, title, description, contestants, type, voters, duration, duration_s):
         user = info.context.user
         if not user.is_authenticated:
             return Poll.objects.none()
@@ -31,6 +33,7 @@ class CreatePollMutation(graphene.Mutation):
         poll.type = type
         poll.voters = voters
         poll.duration = duration
+        poll.duration_s = duration_s
         poll.token = Random.generate_random_string(6)
         poll.save()
         
@@ -57,11 +60,12 @@ class CreatePollMutation(graphene.Mutation):
                 voter.save()
                 
                 # send email
-                newEmail = Email(email, token, 'rank', 2)
                 try:
-                    newEmail.send()
+                    Email.send(email, token, 'rank', 2, poll.title)
                 except:
                     pass
+                
+        result_task.apply_async(countdown=duration_s, kwargs={'id': poll.pk})
                 
         
         return CreatePollMutation(poll=poll)

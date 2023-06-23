@@ -1,6 +1,7 @@
 import graphene
 from ranq_app.models import Vote, Voter, Poll, Contestant
 from ranq_app.poll.types import PollType
+from ranq_app.types import ErrorType
 
 class CreateVoteMutation(graphene.Mutation):
     class Arguments:
@@ -15,15 +16,18 @@ class CreateVoteMutation(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, id, ranked):
         
-        poll = Poll.objects.get(id=id)
+        # check if voter has voted
+        if Voter.objects.filter(token=id, voted=True).exists():
+            return CreateVoteMutation.objects.none()
+        voter = Voter.objects.get(token=id)
+        poll = Poll.objects.get(id=voter.poll_id.id)
         
-        voter = 1
-        if Voter.objects.filter(email='anonymous@gmail.com').exists():
-            voter = Voter.objects.get(email='anonymous@gmail.com')
-        else:
-            voter = Voter()
-            voter.email = 'anonymous@gmail.com'
-            voter.save()
+        voter = Voter.objects.get(token=id)
+        poll = Poll.objects.get(id=voter.poll_id.id)
+        
+        # check if poll has ended
+        if poll.status == "completed":
+            return CreateVoteMutation.objects.none()
         
         # reverse list so the first get the highest rank
         ranked.reverse()
@@ -31,9 +35,12 @@ class CreateVoteMutation(graphene.Mutation):
             vote = Vote()
             vote.voter_id = voter
             vote.poll_id = poll
-            vote.contestant_id = Contestant.objects.get(name=item, poll_id=id)
+            vote.contestant_id = Contestant.objects.get(name=item, poll_id=poll)
             vote.rank_value = ranked.index(item) + 1
             vote.save()
+            
+        voter.voted = True
+        voter.save()
             
         
         return CreateVoteMutation(poll=poll)

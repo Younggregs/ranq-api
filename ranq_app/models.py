@@ -66,6 +66,7 @@ class Poll(BaseModel):
         )
   voters = ArrayField(models.CharField(max_length=150, blank=True))
   duration = models.CharField(max_length = 50)
+  duration_s = models.BigIntegerField(default = 0, blank=True)
   type = models.CharField(max_length = 50, choices = TYPES, default = TypeEnum.public.value)
   status = models.CharField(max_length = 50, choices = STATUSES, default = StatusEnum.ongoing.value)
   token = models.CharField(max_length = 100, blank=True)
@@ -105,12 +106,12 @@ class Voter(BaseModel):
     
 class Vote(BaseModel):
     poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)
-    voter_id = models.ForeignKey(Voter, on_delete = models.PROTECT)
-    contestant_id = models.ForeignKey(Contestant, on_delete = models.PROTECT)
+    voter_id = models.ForeignKey(Voter, on_delete = models.CASCADE)
+    contestant_id = models.ForeignKey(Contestant, on_delete = models.CASCADE)
     rank_value = models.IntegerField()
     
     def __str__(self):
-        return "{}".format(self.poll.title)
+        return "{}".format(self.poll_id.title)
     
     
 class Result(BaseModel):
@@ -119,6 +120,6 @@ class Result(BaseModel):
     popular_vote = models.TextField()
     
     def __str__(self):
-        return "{}".format(self.poll.title)
+        return "{}".format(self.poll_id.title)
     
     
