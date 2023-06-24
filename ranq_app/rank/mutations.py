@@ -1,7 +1,6 @@
 import graphene
 from ranq_app.models import Vote, Voter, Poll, Contestant
 from ranq_app.poll.types import PollType
-from ranq_app.types import ErrorType
 
 class CreateVoteMutation(graphene.Mutation):
     class Arguments:

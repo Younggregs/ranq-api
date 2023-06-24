@@ -14,7 +14,7 @@ def result_task(id):
     poll.status = "completed"
     poll.save()
 
-    voters = Voter.objects.filter(poll_id = poll)
+    voters = Voter.objects.filter(poll_id = poll, voted = True)
     user = User.objects.get(email = poll.created_by)
     
     # send email to poll creator
@@ -27,9 +27,7 @@ def result_task(id):
     for voter in voters:
         # send email
         try:
-            # if voter voted
-            if voter.voted:
-                Email.send(voter.email, poll.token, 'result', 3, poll.title)
+            Email.send(voter.email, poll.token, 'result', 3, poll.title)
         except:
             pass
         

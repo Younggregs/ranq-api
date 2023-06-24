@@ -13,19 +13,24 @@ class CreateVoterMutation(graphene.Mutation):
 
     # The class attributes define the response of the mutation
     voter = graphene.Field(VoterType)
-    error = graphene.Field(ErrorType)
+    errors = graphene.Field(ErrorType)
+    success = graphene.Boolean()
 
     @classmethod
     def mutate(cls, root, info, token, email):
         
         # check if token is valid
         if not Poll.objects.filter(token=token).exists():
-            return CreateVoterMutation(error=ErrorType(message='Invalid token'))
+            return CreateVoterMutation(success = False, errors=ErrorType(message='Invalid token'))
         
         poll = Poll.objects.get(token=token)
         # check if user has voted
         if Voter.objects.filter(email=email, poll_id=poll, voted=True).exists():
-            return CreateVoterMutation(error=ErrorType(message='This email already voted'))
+            return CreateVoterMutation(success = False, errors=ErrorType(message='This email has already voted'))
+        
+        # check if poll has ended
+        if poll.status == "completed":
+            return CreateVoterMutation(success = False, errors=ErrorType(message='Poll has ended'))
         
         # check if user email is registered as voter
         voter = ""
@@ -46,4 +51,4 @@ class CreateVoterMutation(graphene.Mutation):
         except:
             pass
 
-        return CreateVoterMutation(voter=voter)
+        return CreateVoterMutation(success = True, voter=voter)
