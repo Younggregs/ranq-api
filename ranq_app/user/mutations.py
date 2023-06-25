@@ -25,7 +25,7 @@ class EmailVerificationMutation(graphene.Mutation):
         
         templateId = 1
         name = ""
-        page = "signup"
+        page = "signin"
         if type == 'signup_email':
             pass
         elif type == 'forgot_password_email':
@@ -38,10 +38,6 @@ class EmailVerificationMutation(graphene.Mutation):
         
         
         token = Random.generate_random_string()
-        try: 
-            Email.send(email, token, page, templateId, "", name)
-        except:
-            pass
         
         emailToken = ""
         if EmailToken.objects.filter(email=email).exists():
@@ -53,6 +49,11 @@ class EmailVerificationMutation(graphene.Mutation):
         emailToken.type = type
         emailToken.token = token
         emailToken.save()
+        
+        try: 
+            Email.send(email, token, page, templateId, "", name)
+        except:
+            pass
         
         # Notice we return an instance of this mutation
         return EmailVerificationMutation(success=True, errors=None, emailToken=emailToken)
@@ -73,18 +74,19 @@ class SignupMutation(graphene.Mutation):
     def mutate(cls, root, info, name, email, password):
         # raw_password = password
         
-        # check if email exists
-        if User.objects.filter(email=email).exists():
-            return SignupMutation(success=False, errors=ErrorType(message='Email already exists'), user=None)
-        
         # check if email is valid
         if not EmailToken.objects.filter(email=email, type="signup_email").exists():
             return SignupMutation(success=False, errors=ErrorType(message='Email has not been verified'), user=None)
+        
+        # check if email exists
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+        else:
+            user = get_user_model()(
+                first_name=name,
+                email=email,
+            )
 
-        user = get_user_model()(
-            first_name=name,
-            email=email,
-        )
         user.set_password(password)
         user.save()
         
