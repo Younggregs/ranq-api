@@ -20,3 +20,10 @@ class ResultType(DjangoObjectType):
         model = Result
         fields = '__all__'
         
+class PollStatusType(graphene.ObjectType):
+    is_valid = graphene.Boolean()
+    poll_status = graphene.String()
+    is_logged_in = graphene.Boolean()
+    title = graphene.String()
+    email = graphene.String()
+    name = graphene.String()

@@ -1,7 +1,8 @@
 from ranq.celery import app
 from ranq_app.models import Poll, Voter, User, Result
 from ranq_app.lib.email import Email
-from ranq_app.result.rank import Rank
+from ranq_app.result.popular_vote import PopularVote
+from ranq_app.result.ranq_bar import RanqBar
 
 @app.task
 def result_task(id):
@@ -34,7 +35,6 @@ def result_task(id):
     # create results
     result = Result()
     result.poll_id = poll
-    
-    # calculate popular vote
-    result.popular_vote = Rank.popular_vote(id)
+    result.popular_vote = PopularVote.rank(id)
+    result.rank_raise_bar = RanqBar.rank(id)
     result.save()

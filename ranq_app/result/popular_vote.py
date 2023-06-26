@@ -2,10 +2,10 @@ from ranq_app.models import Contestant, Poll, Vote
 from django.db.models import Sum
 import json
 
-class Rank:
+class PopularVote:
     
     @staticmethod
-    def popular_vote(id):
+    def rank(id):
         contestants = Contestant.objects.filter(poll_id = id)
         
         rank = []
@@ -21,7 +21,6 @@ class Rank:
         # assign position
         for i in range(len(rank)):
             rank[i]["position"] = i + 1
-        
          
         return json.dumps(rank)
         
