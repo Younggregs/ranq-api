@@ -2,6 +2,7 @@ import graphene
 from ranq_app.models import Result, User, Poll, EmailToken, Voter
 from ranq_app.user.types import UserType, EmailTokenType
 from ranq_app.poll.types import PollStatusType, PollType, ResultType
+from ranq_app.voter.types import VoterStatusType
 
 class Query(graphene.ObjectType):
     user_by_id = graphene.Field(UserType, id=graphene.String())
@@ -10,6 +11,7 @@ class Query(graphene.ObjectType):
     polls = graphene.List(PollType)
     verify_email_token = graphene.Field(EmailTokenType, token=graphene.String(), type=graphene.String())
     poll_status = graphene.Field(PollStatusType, token=graphene.String())
+    voter_status = graphene.Field(VoterStatusType, token=graphene.String())
     fetch_rank_poll = graphene.Field(PollType, token=graphene.String())
     poll_result = graphene.Field(ResultType, token=graphene.String())
     
@@ -57,7 +59,37 @@ class Query(graphene.ObjectType):
             
         return PollStatusType(is_valid=is_valid, poll_status=poll_status, is_logged_in=is_logged_in, title=title, email=email, name=name)
             
+    
+    def resolve_voter_status(root, info, token):
+        
+        is_valid = False
+        poll_status = "ongoing"
+        voted = False
+        token_ = ""
+        title = ""
+        
+        # check if token is valid
+        if Voter.objects.filter(token=token).exists():
+            is_valid = True
             
+            voter = Voter.objects.get(token=token)
+            
+            # check if voter has voted
+            if voter.voted:
+                voted = True
+                
+            title = "control"
+            
+            # check poll status
+            if Poll.objects.filter(id=voter.poll_id_id).exists():
+                poll = Poll.objects.get(id=voter.poll_id_id)
+                if poll.status == "completed":
+                    poll_status = "completed"
+                
+                token_ = poll.token
+                title = poll.title
+            
+        return VoterStatusType(is_valid=is_valid, poll_status=poll_status, voted=voted, token=token_, title=title)
     
     def resolve_fetch_rank_poll(root, info, token):
         # check if token is valid

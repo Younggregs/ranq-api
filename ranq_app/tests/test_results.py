@@ -61,7 +61,7 @@ class ResultTestCase(TestCase):
         Vote.objects.create(poll_id=poll, contestant_id=d, voter_id=test4, rank_value=2)
     
     def test_popular_vote(self):
-        """Popular vote should be calculated correctly"""
+        """Popular Vote should be calculated correctly"""
         
         user = User.objects.get(email="test@test.com")
         poll = Poll.objects.get(title="test")
@@ -70,7 +70,7 @@ class ResultTestCase(TestCase):
         self.assertEqual(PopularVote.rank(poll.id), json.dumps([{"name": "c", "vote_count": 13, "position": 1}, {"name": "b", "vote_count": 11, "position": 2}, {"name": "a", "vote_count": 9, "position": 3}, {"name": "d", "vote_count": 7, "position": 4}]))
         
     def test_ranq_bar(self):
-        """Popular vote should be calculated correctly"""
+        """Ranq Bar should be calculated correctly"""
         
         user = User.objects.get(email="test@test.com")
         poll = Poll.objects.get(title="test")
