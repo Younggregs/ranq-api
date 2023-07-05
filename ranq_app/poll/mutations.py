@@ -52,16 +52,9 @@ class CreatePollMutation(graphene.Mutation):
                 voter.email = email
                 voter.save()
                 
-                token = Random.generate_random_string()
-                voter = Voter()
-                voter.poll_id = poll
-                voter.email = email
-                voter.token = token
-                voter.save()
-                
                 # send email
                 try:
-                    Email.send(email, token, 'rank', 2, poll.title)
+                    Email.send(email, poll.token, 'rank', 2, poll.title)
                 except:
                     pass
                 

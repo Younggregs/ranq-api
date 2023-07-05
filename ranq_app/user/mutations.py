@@ -13,6 +13,7 @@ class EmailVerificationMutation(graphene.Mutation):
         # The input arguments for this mutation
         email = graphene.String(required=True)
         type = graphene.String(required=True)
+        pollToken = graphene.String(required=False)
 
     # The class attributes define the response of the mutation
     emailToken = graphene.Field(EmailTokenType)
@@ -20,7 +21,7 @@ class EmailVerificationMutation(graphene.Mutation):
     success = graphene.Boolean()
 
     @classmethod
-    def mutate(cls, root, info, email, type):
+    def mutate(cls, root, info, email, type, pollToken=""):
         # raw_password = password
         
         templateId = 1
@@ -51,7 +52,7 @@ class EmailVerificationMutation(graphene.Mutation):
         emailToken.save()
         
         try: 
-            Email.send(email, token, page, templateId, "", name)
+            Email.send(email, token, page, templateId, "", name, pollToken=pollToken)
         except:
             pass
         

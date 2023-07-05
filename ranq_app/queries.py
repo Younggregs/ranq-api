@@ -64,32 +64,35 @@ class Query(graphene.ObjectType):
         
         is_valid = False
         poll_status = "ongoing"
+        is_logged_in = False
         voted = False
-        token_ = ""
         title = ""
+        name = ""
+        email = ""
+        
+        # check if user is logged in
+        user = info.context.user
+        if user.is_authenticated:
+            is_logged_in = True
+            email = user.email
+            name = user.first_name
         
         # check if token is valid
-        if Voter.objects.filter(token=token).exists():
+        if Poll.objects.filter(token=token).exists():
+            poll = Poll.objects.get(token=token)
+            title = poll.title
             is_valid = True
-            
-            voter = Voter.objects.get(token=token)
-            
-            # check if voter has voted
-            if voter.voted:
-                voted = True
-                
-            title = "control"
-            
-            # check poll status
-            if Poll.objects.filter(id=voter.poll_id_id).exists():
-                poll = Poll.objects.get(id=voter.poll_id_id)
-                if poll.status == "completed":
+            if poll.status == "completed":
                     poll_status = "completed"
-                
-                token_ = poll.token
-                title = poll.title
             
-        return VoterStatusType(is_valid=is_valid, poll_status=poll_status, voted=voted, token=token_, title=title)
+            if Voter.objects.filter(email=email, poll_id=poll).exists():
+                voter = Voter.objects.get(email=email, poll_id=poll)
+                
+                # check if voter has voted
+                if voter.voted:
+                    voted = True
+            
+        return VoterStatusType(is_valid=is_valid, poll_status=poll_status, voted=voted, token=token, title=title, is_logged_in=is_logged_in, name = name, email=email)
     
     def resolve_fetch_rank_poll(root, info, token):
         # check if token is valid

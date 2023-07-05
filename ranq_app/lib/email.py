@@ -7,8 +7,10 @@ environ.Env.read_env()
 class Email:
     
     @staticmethod
-    def send(email, token, page, templateId, title="", name=""):
+    def send(email, token, page, templateId, title="", name="", pollToken=False):
         link = env('UI_URL') + '/' + page + '?token=' + str(token)
+        if pollToken:
+            link = link + '&poll=' + str(pollToken)
         
         url = 'https://api.brevo.com/v3/smtp/email'
         headers = {

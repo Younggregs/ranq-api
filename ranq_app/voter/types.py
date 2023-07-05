@@ -10,7 +10,10 @@ class VoterType(DjangoObjectType):
 
 class VoterStatusType(graphene.ObjectType):
     is_valid = graphene.Boolean()
+    is_logged_in = graphene.Boolean()
     poll_status = graphene.String()
     voted = graphene.Boolean()
     token = graphene.String()
     title = graphene.String()
+    email = graphene.String()
+    name = graphene.String()
