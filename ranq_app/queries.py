@@ -19,7 +19,12 @@ class Query(graphene.ObjectType):
         return User.objects.all()
     
     def resolve_polls(root, info, **kwargs):
-        return Poll.objects.all()
+        # check if user is logged in
+        user = info.context.user
+        if user.is_authenticated:
+            poll = Poll.objects.filter(created_by=user)
+            return poll
+        return Poll.objects.none()
 
     def resolve_poll_by_id(root, info, id):
         return Poll.objects.get(token=id)
