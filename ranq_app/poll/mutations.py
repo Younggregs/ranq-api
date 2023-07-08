@@ -37,6 +37,8 @@ class CreatePollMutation(graphene.Mutation):
         poll.token = Random.generate_random_string(6)
         poll.save()
         
+        
+        
         # save contestants
         for item in contestants:
             contestant = Contestant()
@@ -54,9 +56,12 @@ class CreatePollMutation(graphene.Mutation):
                 
                 # send email
                 try:
-                    Email.send(email, poll.token, 'rank', 2, poll.title)
+                    Email.send(email, poll.token, 'rank', 2, poll.title, user.first_name)
                 except:
                     pass
+        # Send email to poll creator
+        if type == 'public':
+            Email.send(user.email, poll.token, 'rank', 5, poll.title, user.first_name)
                 
         result_task.apply_async(countdown=duration_s, kwargs={'id': poll.pk})
                 

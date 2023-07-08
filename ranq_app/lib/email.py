@@ -12,6 +12,9 @@ class Email:
         if pollToken:
             link = link + '&poll=' + str(pollToken)
         
+        if templateId == 6:
+            link = env('UI_URL')
+        
         url = 'https://api.brevo.com/v3/smtp/email'
         headers = {
             "Content-Type": "application/json", 

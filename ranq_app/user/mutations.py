@@ -87,6 +87,9 @@ class SignupMutation(graphene.Mutation):
                 first_name=name,
                 email=email,
             )
+            
+            # Send welcome email
+            Email.send(email, "token", 'rank', 6, "title", name)
 
         user.set_password(password)
         user.save()
