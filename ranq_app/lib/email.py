@@ -8,12 +8,17 @@ class Email:
     
     @staticmethod
     def send(email, token, page, templateId, title="", name="", pollToken=False):
-        link = env('UI_URL') + '/' + page + '?token=' + str(token)
-        if pollToken:
-            link = link + '&poll=' + str(pollToken)
-        
-        if templateId == 6:
+        link = env('UI_URL') + '/'
+        if templateId == 1:
+            link = link + page + '?token=' + str(token)
+            if pollToken:
+                link = link + '&poll=' + str(pollToken)
+        elif templateId == 6:
             link = env('UI_URL')
+        elif templateId == 3:
+            link = env('UI_URL') + '/' + page + '/' + str(token) 
+        else:
+            link = env('UI_URL') + '/' + str(token)
         
         url = 'https://api.brevo.com/v3/smtp/email'
         headers = {
