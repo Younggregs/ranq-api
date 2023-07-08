@@ -78,6 +78,7 @@ GRAPHENE = {
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
+    'SCHEMA_INDENT': 2, 
 }
 
 AUTH_USER_MODEL = "ranq_app.User" 

@@ -1,10 +1,11 @@
+from graphene import relay
 import graphene
 from graphene_django import DjangoObjectType
 from ranq_app.models import Poll, Result, Voter
 
 class PollType(DjangoObjectType):
     class Meta:
-        model = Poll
+        model = Poll 
         fields = '__all__'
         
     # custom field
@@ -15,6 +16,7 @@ class PollType(DjangoObjectType):
     
     resolve_result = lambda self, info: Result.objects.get(poll_id=self.id)
     
+        
 class ResultType(DjangoObjectType):
     class Meta:
         model = Result
