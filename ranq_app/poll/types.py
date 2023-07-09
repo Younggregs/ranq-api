@@ -11,10 +11,13 @@ class PollType(DjangoObjectType):
     # custom field
     votes = graphene.Int()
     result = graphene.Field('ranq_app.poll.types.ResultType')
+    voted = graphene.Boolean()
     
     resolve_votes = lambda self, info: Voter.objects.filter(poll_id=self.id, voted=True).count()
     
     resolve_result = lambda self, info: Result.objects.get(poll_id=self.id)
+    
+    resolve_voted = lambda self, info: Voter.objects.filter(poll_id=self.id, email=info.context.user.email).exists()
     
         
 class ResultType(DjangoObjectType):

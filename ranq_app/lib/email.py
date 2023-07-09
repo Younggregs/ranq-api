@@ -16,9 +16,9 @@ class Email:
         elif templateId == 6:
             link = env('UI_URL')
         elif templateId == 3:
-            link = env('UI_URL') + '/' + page + '/' + str(token) 
-        else:
             link = env('UI_URL') + '/' + str(token)
+        else:
+            link = env('UI_URL') + '/' + page + '/' + str(token)
         
         url = 'https://api.brevo.com/v3/smtp/email'
         headers = {
