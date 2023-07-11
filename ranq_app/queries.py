@@ -38,6 +38,7 @@ class Query(graphene.ObjectType):
         result = Result()
         result.poll_id = poll
         result.rank_raise_bar = RanqBar.rank(poll.id)
+        result.save()
         return poll
     
     def resolve_public_polls(root, info, **kwargs):
