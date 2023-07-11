@@ -4,6 +4,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django_filter import AdvancedDjangoFilterConnectionField, AdvancedFilterSet
 from ranq_app.models import Result, TypeEnum, User, Poll, EmailToken, Voter
 from ranq_app.poll.relay import PollNode
+from ranq_app.result.popular_vote import PopularVote
 from ranq_app.result.ranq_bar import RanqBar
 from ranq_app.user.types import UserType, EmailTokenType
 from ranq_app.poll.types import PollStatusType, PollType, ResultType
@@ -37,6 +38,7 @@ class Query(graphene.ObjectType):
         poll = Poll.objects.get(token=token)
         result = Result()
         result.poll_id = poll
+        result.popular_vote = PopularVote.rank(poll.id)
         result.rank_raise_bar = RanqBar.rank(poll.id)
         result.save()
         return poll
