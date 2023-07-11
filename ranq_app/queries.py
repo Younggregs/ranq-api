@@ -7,7 +7,7 @@ from ranq_app.poll.relay import PollNode
 from ranq_app.result.popular_vote import PopularVote
 from ranq_app.result.ranq_bar import RanqBar
 from ranq_app.user.types import UserType, EmailTokenType
-from ranq_app.poll.types import PollStatusType, PollType, ResultType
+from ranq_app.poll.types import PollStatusType, PollType, ResultType, VoterType
 from ranq_app.voter.types import VoterStatusType
 
 class Query(graphene.ObjectType):
@@ -15,6 +15,7 @@ class Query(graphene.ObjectType):
     users = graphene.List(UserType)
     poll_by_id = graphene.Field(PollType, id=graphene.String())
     calculate_result = graphene.Field(PollType, token=graphene.String()) 
+    voters = graphene.List(VoterType, id=graphene.String())
     polls = AdvancedDjangoFilterConnectionField(PollNode)
     public_polls = AdvancedDjangoFilterConnectionField(PollNode)
     verify_email_token = graphene.Field(EmailTokenType, token=graphene.String(), type=graphene.String())
@@ -33,6 +34,9 @@ class Query(graphene.ObjectType):
             poll = Poll.objects.filter(created_by=user)
             return poll
         return Poll.objects.none()
+
+    def resolve_voters(root, info, id):
+        return Voter.objects.filter(poll_id=id)
 
     def resolve_calculate_result(root, info, token):
         poll = Poll.objects.get(token=token)
