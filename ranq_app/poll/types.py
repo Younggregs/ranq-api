@@ -32,3 +32,8 @@ class PollStatusType(graphene.ObjectType):
     title = graphene.String()
     email = graphene.String()
     name = graphene.String()
+    
+class VoterType(DjangoObjectType):
+    class Meta:
+        model = Voter
+        fields = '__all__'
