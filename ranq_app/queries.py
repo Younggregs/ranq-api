@@ -13,7 +13,7 @@ class Query(graphene.ObjectType):
     user_by_id = graphene.Field(UserType, id=graphene.String())
     users = graphene.List(UserType)
     poll_by_id = graphene.Field(PollType, id=graphene.String())
-    calculate_result = graphene.Field(PollType, id=graphene.String()) 
+    calculate_result = graphene.Field(PollType, token=graphene.String()) 
     polls = AdvancedDjangoFilterConnectionField(PollNode)
     public_polls = AdvancedDjangoFilterConnectionField(PollNode)
     verify_email_token = graphene.Field(EmailTokenType, token=graphene.String(), type=graphene.String())
