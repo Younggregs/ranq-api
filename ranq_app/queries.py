@@ -4,6 +4,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django_filter import AdvancedDjangoFilterConnectionField, AdvancedFilterSet
 from ranq_app.models import Result, TypeEnum, User, Poll, EmailToken, Voter
 from ranq_app.poll.relay import PollNode
+from ranq_app.result.ranq_bar import RanqBar
 from ranq_app.user.types import UserType, EmailTokenType
 from ranq_app.poll.types import PollStatusType, PollType, ResultType
 from ranq_app.voter.types import VoterStatusType
@@ -12,6 +13,7 @@ class Query(graphene.ObjectType):
     user_by_id = graphene.Field(UserType, id=graphene.String())
     users = graphene.List(UserType)
     poll_by_id = graphene.Field(PollType, id=graphene.String())
+    calculate_result = graphene.Field(PollType, id=graphene.String()) 
     polls = AdvancedDjangoFilterConnectionField(PollNode)
     public_polls = AdvancedDjangoFilterConnectionField(PollNode)
     verify_email_token = graphene.Field(EmailTokenType, token=graphene.String(), type=graphene.String())
@@ -30,6 +32,13 @@ class Query(graphene.ObjectType):
             poll = Poll.objects.filter(created_by=user)
             return poll
         return Poll.objects.none()
+
+    def resolve_calculate_result(root, info, token):
+        poll = Poll.objects.get(token=token)
+        result = Result()
+        result.poll_id = poll
+        result.rank_raise_bar = RanqBar.rank(poll.id)
+        return poll
     
     def resolve_public_polls(root, info, **kwargs):
         return Poll.objects.filter(type = TypeEnum.public.value)
