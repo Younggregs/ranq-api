@@ -106,8 +106,11 @@ class RanqBar(object):
         # assign position
         stack.reverse()
         for i in range(len(stack)):
+            name = "--"
+            if stack[i].name == None:
+                name = stack[i].name
             rank.append({
-                "name": stack[i].name or "--",
+                "name": name,
                 "vote_count": "--",
                 "position": i + 1
             })
