@@ -105,12 +105,10 @@ class RanqBar(object):
         rank = []     
         # assign position
         stack.reverse()
+        return json.dumps(stack)
         for i in range(len(stack)):
-            name = "--"
-            if stack[i].name != None:
-                name = stack[i].name
             rank.append({
-                "name": name,
+                "name": stack[i].name,
                 "vote_count": "--",
                 "position": i + 1
             })
