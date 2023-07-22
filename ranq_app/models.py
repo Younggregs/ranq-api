@@ -35,9 +35,6 @@ class BaseModel(models.Model):
     is_deleted = models.BooleanField(default = False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
-    
-    class Meta:
-        abstract = True
 
 class User(AbstractUser):
     id = models.UUIDField(
