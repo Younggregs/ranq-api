@@ -66,7 +66,7 @@ class Query(graphene.ObjectType):
             result = Result()
             result.poll_id = poll
         result.popular_vote = PopularVote.rank(poll.id, valid_voters)
-        result.rank_raise_bar = RanqBar.rank(poll.id, valid_voters)
+        # result.rank_raise_bar = RanqBar.rank(poll.id, valid_voters)
         result.save()
         return poll
     
