@@ -35,6 +35,9 @@ class BaseModel(models.Model):
     is_deleted = models.BooleanField(default = False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        abstract = True
 
 class User(AbstractUser):
     id = models.UUIDField(
@@ -116,8 +119,8 @@ class Vote(BaseModel):
     
 class Result(BaseModel):
     poll_id = models.ForeignKey(Poll, on_delete = models.CASCADE)
-    rank_raise_bar = models.TextField()
-    popular_vote = models.TextField()
+    rank_raise_bar = models.JSONField()
+    popular_vote = models.JSONField()
     
     def __str__(self):
         return "{}".format(self.poll_id.title)
