@@ -6,7 +6,7 @@ from ranq_app.models import Contestant, Vote
 class RanqBar(object):
     
     @staticmethod
-    def rank(id):
+    def rank(id, valid_voters=None):
         # get list of contestants
         contestants_queryset = Contestant.objects.filter(poll_id = id)
         contestants = list(map(lambda contestant: contestant, contestants_queryset))
@@ -25,7 +25,7 @@ class RanqBar(object):
         bar_limit = len(contestants) + 1
         
         # get list of votes
-        votes = Vote.objects.filter(poll_id = id)
+        votes = Vote.objects.filter(poll_id = id, voter_id_id__in = valid_voters)
         
         # create a while loop
         running = True

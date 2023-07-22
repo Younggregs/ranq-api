@@ -2,7 +2,7 @@ import graphene
 from graphene import relay
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django_filter import AdvancedDjangoFilterConnectionField, AdvancedFilterSet
-from ranq_app.models import Result, TypeEnum, User, Poll, EmailToken, Voter
+from ranq_app.models import Result, TypeEnum, User, Poll, EmailToken, Vote, Voter
 from ranq_app.poll.relay import PollNode
 from ranq_app.result.popular_vote import PopularVote
 from ranq_app.result.ranq_bar import RanqBar
@@ -39,11 +39,34 @@ class Query(graphene.ObjectType):
         return Voter.objects.filter(poll_id=id)
 
     def resolve_calculate_result(root, info, token):
+        #1. get poll contestants array, and create a dictionary of contestants 
+        # with their name as key and index as value
+        #2. get all voters for the poll
+        #3. for each voter, get votes
+        #4. create a dictionary of votes with contestant index as key and rank as value
+        #5. compare the poll contestants dict with the voter dict
+        #6. if thesame, add to list, else pass
+        
         poll = Poll.objects.get(token=token)
-        result = Result()
-        result.poll_id = poll
-        # result.popular_vote = PopularVote.rank(poll.id)
-        result.rank_raise_bar = RanqBar.rank(poll.id)
+        n = len(poll.contestants)
+        poll_contestants = {v: n - k for k, v in enumerate(poll.contestants)}
+        
+        voters = Voter.objects.filter(poll_id=poll)
+        valid_voters = []
+        for voter in voters:
+            voter_votes = Vote.objects.filter(voter_id=voter, poll_id=poll)
+            voter_votes_dict = {k.contestant_id.name: k.rank_value for k in voter_votes}
+            
+            if poll_contestants != voter_votes_dict:
+                valid_voters.append(voter.id)
+        
+        if Result.objects.filter(poll_id=poll).exists():
+            result = Result.objects.get(poll_id=poll)
+        else:
+            result = Result()
+            result.poll_id = poll
+        result.popular_vote = PopularVote.rank(poll.id, valid_voters)
+        result.rank_raise_bar = RanqBar.rank(poll.id, valid_voters)
         result.save()
         return poll
     

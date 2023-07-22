@@ -5,14 +5,14 @@ import json
 class PopularVote:
     
     @staticmethod
-    def rank(id):
+    def rank(id, valid_voters=None):
         contestants = Contestant.objects.filter(poll_id = id)
         
         rank = []
         for contestant in contestants:
             rank.append({
                 "name": contestant.name,
-                "vote_count": Vote.objects.filter(poll_id = id, contestant_id = contestant.id).aggregate(Sum('rank_value'))['rank_value__sum'] or 0,
+                "vote_count": Vote.objects.filter(poll_id = id, contestant_id = contestant.id, voter_id_id__in = valid_voters).aggregate(Sum('rank_value'))['rank_value__sum'] or 0,
             })
             
         # sort by in descending order
